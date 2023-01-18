@@ -1,5 +1,4 @@
-# WP-FinalProject
-## Taipei Router
+# Taipei Router
 Implementation of **Attractions Recommendation WebGIS Application** using React.js(frontend) and Node.js(backend).
 About geographic information technology, use **OpenLayers Maps** into React frame and introduce **OpenRouteService API**.
 
