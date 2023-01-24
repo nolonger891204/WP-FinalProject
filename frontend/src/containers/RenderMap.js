@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import Map from "../components/Map";
 import { Loading } from "../components/Loading";
-import { Layers, TileLayer, VectorLayer, MapBoxLayer } from "../components/Layers";
+import { Layers, TileLayer, VectorLayer, MapBoxLayer } from "../components/layers";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import Geolocation from 'ol/Geolocation.js';

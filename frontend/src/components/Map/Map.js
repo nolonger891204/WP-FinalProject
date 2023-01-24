@@ -6,6 +6,9 @@ import { Popup } from "./Popup";
 import { Button, message } from 'antd';
 import HomePageContext from "../../containers/hook/HomepageContext";
 import { SendScoreModal } from "../SendScoreModal";
+import { Icon, Style } from "ol/style";
+import localimage from "./../../data/images/pin.svg";
+import localimage_pink from "./../../data/images/pin_pink.svg";
 
 const Map = ({ children, zoom, center, setCenter, user, setloading1 }) => {
 	const mapRef = useRef();
@@ -14,7 +17,7 @@ const Map = ({ children, zoom, center, setCenter, user, setloading1 }) => {
 	const [ initPlace, setInitPlace ] = useState("臺鐵臺北車站");
 	const [ open, setOpen ] = useState(false); //Does modal open
 	const { showSteps, setAllFeactures, setDisplayMap } = useContext(HomePageContext);
-	
+
 	const handleRouterButton = () => {
 		if (showSteps === true) {
 			// setAllFeactures(false);
@@ -44,7 +47,8 @@ const Map = ({ children, zoom, center, setCenter, user, setloading1 }) => {
 		mapObject.setTarget(mapRef.current);
 		setMap(mapObject);
 		mapObject.addOverlay(popupObject);
-		mapObject.on('click', (evt) => handleSingleClick(mapObject, popupObject,  evt));
+		mapObject.on('click', (evt) => handleSingleClick(mapObject, popupObject, evt));
+		mapObject.on('pointermove', (evt) => handleHover(mapObject, evt))
 		document.getElementById("popup_close").onclick = () => popupObject.setPosition(undefined);
 		
 		return () => {
@@ -65,6 +69,53 @@ const Map = ({ children, zoom, center, setCenter, user, setloading1 }) => {
 
 		map.getView().setCenter(center);
 	}, [center])
+
+	
+	const selectStyle = new Style({
+		image: new Icon({
+			anchor: [18, 36],
+			anchorXUnits: 'pixels',
+			anchorYUnits: 'pixels',
+			crossOrigin: 'anonymous',
+			src: localimage_pink,
+			scale: 1.1,
+		}),
+	});
+
+	const notselectStyle = new Style({
+		image: new Icon({
+			anchor: [18, 36],
+			anchorXUnits: 'pixels',
+			anchorYUnits: 'pixels',
+			crossOrigin: 'anonymous',
+			src: localimage,
+			scale: 1,
+		}),
+	});
+
+	// hover features
+	const handleHover = useCallback((mapObject,  evt) => {
+		const { coordinate, pixel } = evt;
+
+		mapObject.getLayers().forEach(function(el) {
+			if (el.get('name') === 'spot') {
+			  	el.getSource().forEachFeature( (feature) => {
+					feature.setStyle(notselectStyle);
+				});
+			}
+		})
+		var feature = mapObject.forEachFeatureAtPixel(pixel, (feature) => {			
+            return feature;
+        }, {
+			layerFilter: (layer) => {
+				return (layer.get('name') === 'spot' || layer.get('name') === 'steps_point') ;
+			}
+		});	
+
+		if (feature) {
+			feature.setStyle(selectStyle);
+		} 
+	}, []);
 
 	// show popup
 	const handleSingleClick = useCallback((mapObject, popupObject, evt) => {
